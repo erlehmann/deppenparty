@@ -28,7 +28,7 @@ WHITE = (255, 255, 255)
 BACKGROUND = (63, 72, 204)
 FOREGROUND = (255, 201, 14)
 
-STATE_BOARD, STATE_ANSWER, STATE_QUESTION = range(3)
+STATE_BOARD, STATE_ANSWER, STATE_ANSWER_NOSWITCH, STATE_QUESTION = range(4)
 
 class Answer(object):
     def __init__(self, answer, question, points):
@@ -141,6 +141,12 @@ class Game(object):
                     self.state = STATE_QUESTION
                 if event.key == pygame.K_TAB:
                     self.switch_players()
+                    self.state = STATE_ANSWER_NOSWITCH
+            elif self.state == STATE_ANSWER_NOSWITCH:
+                if event.key == pygame.K_RETURN:
+                    self.state = STATE_QUESTION
+                if event.key == pygame.K_TAB:
+                    self.state = STATE_BOARD
             elif self.state == STATE_QUESTION:
                 if event.key == pygame.K_RETURN:
                     answer = self.get_current_answer()
@@ -154,7 +160,7 @@ class Game(object):
     def render(self):
         if self.state == STATE_BOARD:
             self.render_board()
-        elif self.state == STATE_ANSWER:
+        elif self.state in (STATE_ANSWER, STATE_ANSWER_NOSWITCH):
             self.render_answer()
         elif self.state == STATE_QUESTION:
             self.render_question()
