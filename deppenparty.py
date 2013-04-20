@@ -71,14 +71,38 @@ class Game(object):
         self.font = pygame.font.SysFont('sans', 32)
         self.clock = pygame.time.Clock()
         self.state = STATE_BOARD
+        self.cursor = [0,0]
+
+    def handle_event(self, event):
+        if event.type == pygame.QUIT:
+            self.running = False
+        elif event.type == pygame.KEYDOWN:
+            if self.state == STATE_BOARD:
+                if event.key == pygame.K_LEFT:
+                    if self.cursor[0] > 0:
+                        self.cursor[0] -= 1
+                elif event.key == pygame.K_RIGHT:
+                    if self.cursor[0] < len(self.categories) - 1:
+                        self.cursor[0] += 1
+                elif event.key == pygame.K_UP:
+                    if self.cursor[1] > 0:
+                        self.cursor[1] -= 1
+                elif event.key == pygame.K_DOWN:
+                    if self.cursor[1] < \
+                            len(self.categories[0]['content']) - 1:
+                        self.cursor[1] += 1
+            elif self.state == STATE_ANSWER:
+                raise NotImplementedError
+            elif self.state == STATE_QUESTION:
+                raise NotImplementedError
 
     def render(self):
         if self.state == STATE_BOARD:
-            self.render_board
+            self.render_board()
         elif self.state == STATE_ANSWER:
-            self.render_answer
+            self.render_answer()
         elif self.state == STATE_QUESTION:
-            self.render_question
+            self.render_question()
 
     def render_answer(self):
         raise NotImplementedError
@@ -132,6 +156,10 @@ class Game(object):
             # draw answer tiles
             for j in range(row_count - 1):
                 y += margin + row_height
+                if i == self.cursor[0] and j == self.cursor[1]:
+                    pygame.draw.rect(self.screen, WHITE,
+                        (x-margin/2, y-margin/2, \
+                             col_width+margin, row_height+margin), 0)
                 pygame.draw.rect(self.screen, BACKGROUND, \
                     (x, y, col_width, row_height), 0)
                 self.render_text(
@@ -148,8 +176,6 @@ class Game(object):
                                  (x, y, player_width, row_height), 0)
             self.render_text('%s: %s' % (player.name, player.points), x, y)
 
-        pygame.display.flip()
-
     def render_question(self):
         raise NotImplementedError
 
@@ -164,12 +190,17 @@ class Game(object):
 
     def run(self):
         logging.debug('Game started.')
-        #self.render_text('Deppenparty!')
-        #for i in range(60):
-        #    self.clock.tick(FRAMERATE)
-        self.render_board()
-        for i in range(120):
+        self.dirty = True
+        self.running = True
+        while self.running:
             self.clock.tick(FRAMERATE)
+            if self.dirty:
+                self.render()
+                pygame.display.flip()
+                self.dirty = False
+            for event in pygame.event.get():
+                self.handle_event(event)
+                self.dirty = True
         logging.debug('Game quit')
 
 if __name__ == '__main__':
