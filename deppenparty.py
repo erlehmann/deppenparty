@@ -47,10 +47,14 @@ class Game(object):
                 'name': line[0].decode('utf-8'),
                 'content': [
                     {
-                        'type': token.split(':')[0],
-                        # type can be one of 'TEXT', 'IMAGE', 'AUDIO'
-                        'answer': token.split(':')[1].decode('utf-8'),
-                        'question': token.split(':')[2].decode('utf-8'),
+                        'answer': (
+                            token.split('|')[0].split(':')[0],
+                            token.split('|')[0].split(':')[1].decode('utf-8')
+                            ),
+                        'question': (
+                            token.split('|')[1].split(':')[0],
+                            token.split('|')[1].split(':')[1].decode('utf-8')
+                            ),
                         'active': True,
                         'points': int(board[0][i+1])
                         } for i, token in enumerate(line[1:])
