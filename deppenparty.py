@@ -29,6 +29,13 @@ FOREGROUND = (255, 201, 14)
 
 STATE_BOARD, STATE_ANSWER, STATE_QUESTION = range(3)
 
+class Answer(object):
+    def __init__(self, answer, question, points):
+        self.answer = answer
+        self.question = question
+        self.active = True
+        self.points = points
+
 class Cursor(object):
     def __init__(self, x, y):
         self.x, self.y = x, y
@@ -65,18 +72,17 @@ class Game(object):
             {
                 'name': line[0].decode('utf-8'),
                 'content': [
-                    {
-                        'answer': (
+                    Answer(
+                        answer=(
                             token.split('|')[0].split(':')[0],
                             token.split('|')[0].split(':')[1].decode('utf-8')
                             ),
-                        'question': (
+                        question=(
                             token.split('|')[1].split(':')[0],
                             token.split('|')[1].split(':')[1].decode('utf-8')
                             ),
-                        'active': True,
-                        'points': int(board[0][i+1])
-                        } for i, token in enumerate(line[1:])
+                        points=int(board[0][i+1])
+                        ) for i, token in enumerate(line[1:])
                     ]
                 } for line in board[1:]
             ]
@@ -91,6 +97,9 @@ class Game(object):
         self.clock = pygame.time.Clock()
         self.state = STATE_BOARD
         self.cursor = Cursor(0,0)
+
+    def get_current_category(self):
+        raise NotImplementedError
 
     def handle_event(self, event):
         if event.type == pygame.QUIT:
@@ -112,7 +121,7 @@ class Game(object):
                         self.cursor.down()
                 elif event.key == pygame.K_RETURN:
                     logging.debug('Answer at %s selected.' % self.cursor)
-                    self.state == STATE_ANSWER
+                    self.state = STATE_ANSWER
             elif self.state == STATE_ANSWER:
                 raise NotImplementedError
             elif self.state == STATE_QUESTION:
@@ -185,7 +194,7 @@ class Game(object):
                 pygame.draw.rect(self.screen, BACKGROUND, \
                     (x, y, col_width, row_height), 0)
                 self.render_text(
-                    str(self.categories[i]['content'][j]['points']), x, y)
+                    str(self.categories[i]['content'][j].points), x, y)
 
         player_count = len(self.players)
         player_width = (self.width - ((3 + player_count) * margin)) / \
