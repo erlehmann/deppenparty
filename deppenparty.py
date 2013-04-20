@@ -128,9 +128,11 @@ class Game(object):
                         (self.cursor, self.get_current_answer()))
                     self.state = STATE_ANSWER
             elif self.state == STATE_ANSWER:
-                raise NotImplementedError
+                if event.key == pygame.K_RETURN:
+                    self.state = STATE_QUESTION
             elif self.state == STATE_QUESTION:
-                raise NotImplementedError
+                if event.key == pygame.K_RETURN:
+                    self.state = STATE_BOARD
 
     def render(self):
         if self.state == STATE_BOARD:
@@ -148,6 +150,7 @@ class Game(object):
         self.screen.fill(BACKGROUND)
         self.font = pygame.font.SysFont('sans', self.height / 12)
         logging.debug(content)
+        # draw text content
         if content[0] == 'TEXT':
             text = textwrap.wrap(content[1], 24)
             offset = 0
@@ -156,6 +159,16 @@ class Game(object):
                                      self.height / 8 + offset)
                 offset += 1.5 * self.font.get_linesize()
                 logging.debug(offset)
+        # draw image content
+        elif content[0] == 'IMAGE':
+            image = pygame.image.load(content[1])
+            self.screen.blit(
+                image,
+                (
+                    self.width/2 - image.get_width()/2,
+                    self.height/2 - image.get_height()/2
+                )
+            )
         else:
             raise NotImplementedError
 
@@ -229,7 +242,8 @@ class Game(object):
             self.render_text('%s: %s' % (player.name, player.points), x, y)
 
     def render_question(self):
-        raise NotImplementedError
+        question = self.get_current_answer().question
+        self.render_content(question)
 
     def render_text(self, text, x, y):
         surface = self.font.render(text, 1, FOREGROUND)
@@ -247,6 +261,7 @@ class Game(object):
         while self.running:
             self.clock.tick(FRAMERATE)
             if self.dirty:
+                logging.debug('Rendering for state %s.' % self.state)
                 self.render()
                 pygame.display.flip()
                 self.dirty = False
