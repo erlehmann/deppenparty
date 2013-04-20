@@ -18,6 +18,7 @@ import logging
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 
 import pygame
+import textwrap
 
 FRAMERATE = 60
 
@@ -35,6 +36,9 @@ class Answer(object):
         self.question = question
         self.active = True
         self.points = points
+
+    def __repr__(self):
+        return 'Answer: %s, Question: %s' % (self.answer, self.question)
 
 class Cursor(object):
     def __init__(self, x, y):
@@ -98,8 +102,8 @@ class Game(object):
         self.state = STATE_BOARD
         self.cursor = Cursor(0,0)
 
-    def get_current_category(self):
-        raise NotImplementedError
+    def get_current_answer(self):
+        return self.categories[self.cursor.x]['content'][self.cursor.y]
 
     def handle_event(self, event):
         if event.type == pygame.QUIT:
@@ -120,7 +124,8 @@ class Game(object):
                             len(self.categories[0]['content']) - 1:
                         self.cursor.down()
                 elif event.key == pygame.K_RETURN:
-                    logging.debug('Answer at %s selected.' % self.cursor)
+                    logging.debug('Answer at %s selected: %s' % \
+                        (self.cursor, self.get_current_answer()))
                     self.state = STATE_ANSWER
             elif self.state == STATE_ANSWER:
                 raise NotImplementedError
@@ -136,7 +141,23 @@ class Game(object):
             self.render_question()
 
     def render_answer(self):
-        raise NotImplementedError
+        answer = self.get_current_answer().answer
+        self.render_content(answer)
+
+    def render_content(self, content):
+        self.screen.fill(BACKGROUND)
+        self.font = pygame.font.SysFont('sans', self.height / 12)
+        logging.debug(content)
+        if content[0] == 'TEXT':
+            text = textwrap.wrap(content[1], 24)
+            offset = 0
+            for line in text:
+                self.render_text(line, self.width / 8, \
+                                     self.height / 8 + offset)
+                offset += 1.5 * self.font.get_linesize()
+                logging.debug(offset)
+        else:
+            raise NotImplementedError
 
     def render_board(self):
         self.screen.fill(GRAY)
