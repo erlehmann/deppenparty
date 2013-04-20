@@ -215,5 +215,9 @@ if __name__ == '__main__':
     args = parser.parse_args()
     logging.debug(args)
 
-    game = Game(args.filename, args.name1, args.name2)
+    game = Game(
+        args.filename,
+        args.name1.decode('utf-8'),
+        args.name2.decode('utf-8')
+        )
     game.run()
