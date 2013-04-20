@@ -68,6 +68,7 @@ class Player(object):
 class Game(object):
     def __init__(self, filename, name1, name2):
         self.players = (Player(name1), Player(name2))
+        self.active_player = self.players[0]
 
         with open(filename) as f:
             # parse by column <http://stackoverflow.com/questions/11059390/parsing-a-tab-separated-file-in-python#answer-11059449>
@@ -138,6 +139,8 @@ class Game(object):
             elif self.state == STATE_ANSWER:
                 if event.key == pygame.K_RETURN:
                     self.state = STATE_QUESTION
+                if event.key == pygame.K_TAB:
+                    self.switch_players()
             elif self.state == STATE_QUESTION:
                 if event.key == pygame.K_RETURN:
                     self.state = STATE_BOARD
@@ -153,6 +156,10 @@ class Game(object):
     def render_answer(self):
         answer = self.get_current_answer().answer
         self.render_content(answer)
+        self.font = pygame.font.SysFont('sans', self.height / 24)
+        self.render_text('Player %s: Return to answer, Tab to pass.' % \
+            self.active_player.name, \
+            40, self.height - self.font.get_linesize() - 40)
 
     def render_content(self, content):
         self.screen.fill(BACKGROUND)
@@ -252,6 +259,9 @@ class Game(object):
             # draw player tiles
             x = (2 * margin) + i * (player_width + margin)
             y = (row_height + margin) * (row_count) + 6 * margin
+            if player == self.active_player:
+                pygame.draw.rect(self.screen, WHITE, (x-margin/2, \
+                    y-margin/2, player_width+margin, row_height+margin), 0)
             pygame.draw.rect(self.screen, BACKGROUND, \
                                  (x, y, player_width, row_height), 0)
             self.render_text('%s: %s' % (player.name, player.points), x, y)
@@ -284,6 +294,12 @@ class Game(object):
                 self.handle_event(event)
                 self.dirty = True
         logging.debug('Game quit')
+
+    def switch_players(self):
+        for player in self.players:
+            if player != self.active_player:
+                self.active_player = player
+                break
 
 if __name__ == '__main__':
     from argparse import ArgumentParser
