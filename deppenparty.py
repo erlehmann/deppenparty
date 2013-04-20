@@ -143,6 +143,12 @@ class Game(object):
                     self.switch_players()
             elif self.state == STATE_QUESTION:
                 if event.key == pygame.K_RETURN:
+                    answer = self.get_current_answer()
+                    self.active_player.points += answer.points
+                    self.state = STATE_BOARD
+                if event.key == pygame.K_SPACE:
+                    answer = self.get_current_answer()
+                    self.active_player.points -= answer.points
                     self.state = STATE_BOARD
 
     def render(self):
@@ -157,7 +163,7 @@ class Game(object):
         answer = self.get_current_answer().answer
         self.render_content(answer)
         self.font = pygame.font.SysFont('sans', self.height / 24)
-        self.render_text('Player %s: Return to answer, Tab to pass.' % \
+        self.render_text('Player %s: Return to solution, Tab to pass.' % \
             self.active_player.name, \
             40, self.height - self.font.get_linesize() - 40)
 
@@ -269,6 +275,10 @@ class Game(object):
     def render_question(self):
         question = self.get_current_answer().question
         self.render_content(question)
+        self.font = pygame.font.SysFont('sans', self.height / 24)
+        self.render_text('Player %s: Return if right, Space if wrong.' % \
+            self.active_player.name, \
+            40, self.height - self.font.get_linesize() - 40)
 
     def render_text(self, text, x, y):
         surface = self.font.render(text, 1, FOREGROUND)
