@@ -29,6 +29,25 @@ FOREGROUND = (255, 201, 14)
 
 STATE_BOARD, STATE_ANSWER, STATE_QUESTION = range(3)
 
+class Cursor(object):
+    def __init__(self, x, y):
+        self.x, self.y = x, y
+
+    def __repr__(self):
+        return '(%s, %s)' % (self.x, self.y)
+
+    def left(self):
+        self.x -= 1
+
+    def right(self):
+        self.x += 1
+
+    def up(self):
+        self.y -= 1
+
+    def down(self):
+        self.y += 1
+
 class Player(object):
     def __init__(self, name):
         self.name = name
@@ -71,7 +90,7 @@ class Game(object):
         self.font = pygame.font.SysFont('sans', 32)
         self.clock = pygame.time.Clock()
         self.state = STATE_BOARD
-        self.cursor = [0,0]
+        self.cursor = Cursor(0,0)
 
     def handle_event(self, event):
         if event.type == pygame.QUIT:
@@ -79,18 +98,21 @@ class Game(object):
         elif event.type == pygame.KEYDOWN:
             if self.state == STATE_BOARD:
                 if event.key == pygame.K_LEFT:
-                    if self.cursor[0] > 0:
-                        self.cursor[0] -= 1
+                    if self.cursor.x > 0:
+                        self.cursor.left()
                 elif event.key == pygame.K_RIGHT:
-                    if self.cursor[0] < len(self.categories) - 1:
-                        self.cursor[0] += 1
+                    if self.cursor.x < len(self.categories) - 1:
+                        self.cursor.right()
                 elif event.key == pygame.K_UP:
-                    if self.cursor[1] > 0:
-                        self.cursor[1] -= 1
+                    if self.cursor.y > 0:
+                        self.cursor.up()
                 elif event.key == pygame.K_DOWN:
-                    if self.cursor[1] < \
+                    if self.cursor.y < \
                             len(self.categories[0]['content']) - 1:
-                        self.cursor[1] += 1
+                        self.cursor.down()
+                elif event.key == pygame.K_RETURN:
+                    logging.debug('Answer at %s selected.' % self.cursor)
+                    self.state == STATE_ANSWER
             elif self.state == STATE_ANSWER:
                 raise NotImplementedError
             elif self.state == STATE_QUESTION:
@@ -156,7 +178,7 @@ class Game(object):
             # draw answer tiles
             for j in range(row_count - 1):
                 y += margin + row_height
-                if i == self.cursor[0] and j == self.cursor[1]:
+                if i == self.cursor.x and j == self.cursor.y:
                     pygame.draw.rect(self.screen, WHITE,
                         (x-margin/2, y-margin/2, \
                              col_width+margin, row_height+margin), 0)
