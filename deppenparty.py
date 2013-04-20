@@ -92,6 +92,7 @@ class Game(object):
             ]
         logging.debug(self.categories)
 
+        pygame.mixer.pre_init(44100, -16, 2, 2048)
         pygame.init()
         pygame.display.set_caption('Deppenparty!')
 
@@ -169,7 +170,10 @@ class Game(object):
                     self.height/2 - image.get_height()/2
                 )
             )
+        elif content[0] == 'AUDIO':
+            pygame.mixer.Sound(content[1]).play()
         else:
+            logging.critical('Unknown content type %s.' % str(content[0]))
             raise NotImplementedError
 
     def render_board(self):
