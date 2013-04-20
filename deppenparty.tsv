@@ -1,6 +1,6 @@
-JEOPARDY!	Männer	Buchstaben	Zahlen
-100	TEXT:„Gott ist tot.“|TEXT:Nietzsche	IMAGE:A.png|TEXT:A	TEXT:1|TEXT:1
-200	TEXT:„Religion […] ist das Opium des Volkes.“|TEXT:Marx	IMAGE:B.png|TEXT:b	TEXT:2|TEXT:1+1
-300	TEXT:„Der Staat ist die Wirklichkeit der sittlichen Idee.“|TEXT:Hegel	IMAGE:C.png|TEXT:C	TEXT:3|TEXT:1+1+1
-400	TEXT:„Wovon man nicht sprechen kann, darüber muss man schweigen.“|TEXT:Wittgenstein	IMAGE:D.png|TEXT:D	TEXT:4|TEXT:1+1+1+1
-500	TEXT:„Aufgabe von Kunst ist es heute, Chaos in die Ordnung zu bringen.“|TEXT:Adorno	IMAGE:E.png|TEXT:E	TEXT:5|TEXT:1+1+1+1+1
+JEOPARDY!	Männer	Buchstaben	Akkorde
+100	TEXT:„Gott ist tot.“|TEXT:Nietzsche	IMAGE:A.png|TEXT:A	AUDIO:A1-E2-A2-C3-E3.ogg|TEXT:A1-E2-A2-C3-E3
+200	TEXT:„Religion […] ist das Opium des Volkes.“|TEXT:Marx	IMAGE:B.png|TEXT:b	AUDIO:C2-E2-G2-C3-E3.ogg|TEXT:C2-E2-G2-C3-E3
+300	TEXT:„Der Staat ist die Wirklichkeit der sittlichen Idee.“|TEXT:Hegel	IMAGE:C.png|TEXT:C	AUDIO:F2-A2-C3-F3.ogg|TEXT:F2-A2-C3-F3
+400	TEXT:„Wovon man nicht sprechen kann, darüber muss man schweigen.“|TEXT:Wittgenstein	IMAGE:D.png|TEXT:D	AUDIO:Bb1-F2-Bb2-D3.ogg|TEXT:Bb1-F2-Bb2-D3
+500	TEXT:„Aufgabe von Kunst ist es heute, Chaos in die Ordnung zu bringen.“|TEXT:Adorno	IMAGE:E.png|TEXT:E	AUDIO:D2-A2-D3-F3.ogg|TEXT:D2-A2-D3-F3
