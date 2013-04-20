@@ -27,10 +27,16 @@ WHITE = (255, 255, 255)
 BACKGROUND = (63, 72, 204)
 FOREGROUND = (255, 201, 14)
 
+STATE_BOARD, STATE_ANSWER, STATE_QUESTION = range(3)
+
+class Player(object):
+    def __init__(self, name):
+        self.name = name
+        self.points = 0
+
 class Game(object):
     def __init__(self, filename, name1, name2):
-        self.name1 = name1
-        self.name2 = name2
+        self.players = (Player(name1), Player(name2))
 
         with open(filename) as f:
             # parse by column <http://stackoverflow.com/questions/11059390/parsing-a-tab-separated-file-in-python#answer-11059449>
@@ -60,16 +66,29 @@ class Game(object):
         self.screen = pygame.display.set_mode(self.size)
         self.font = pygame.font.SysFont('sans', 32)
         self.clock = pygame.time.Clock()
+        self.state = STATE_BOARD
+
+    def render(self):
+        if self.state == STATE_BOARD:
+            self.render_board
+        elif self.state == STATE_ANSWER:
+            self.render_answer
+        elif self.state == STATE_QUESTION:
+            self.render_question
+
+    def render_answer(self):
+        raise NotImplementedError
 
     def render_board(self):
         self.screen.fill(GRAY)
 
         margin = 20
+        offset = 5 * margin
         col_count = len(self.categories)
         col_width = (self.width - ((3 + col_count) * margin)) / col_count
         logging.debug('%s columns, width %s.' % (col_count, col_width))
         row_count = len(self.categories[0]['content']) + 1
-        row_height = (self.height - ((5 + row_count) * margin)) / row_count
+        row_height = (self.height - offset - ((5 + row_count) * margin)) / row_count
         logging.debug('%s rows, height %s.' % (row_count, row_height))
         self.font = pygame.font.SysFont('sans', row_height / 2)
 
@@ -90,6 +109,15 @@ class Game(object):
                 (row_height + margin) * (row_count - 1) + margin
                 ),
             0)
+        pygame.draw.rect(
+            self.screen, BLACK, (
+                margin,
+                (row_height + margin) * (row_count) + 5 * margin,
+                (col_width + margin) * col_count + margin,
+                row_height + 2 * margin
+                ),
+            0)
+
         for i in range(col_count):
             # draw category tiles
             x, y = (2 * margin) + i * (col_width + margin), 2 * margin
@@ -104,7 +132,22 @@ class Game(object):
                     (x, y, col_width, row_height), 0)
                 self.render_text(
                     str(self.categories[i]['content'][j]['points']), x, y)
-        pygame.display.update()
+
+        player_count = len(self.players)
+        player_width = (self.width - ((3 + player_count) * margin)) / \
+            player_count
+        for i, player in enumerate(self.players):
+            # draw player tiles
+            x = (2 * margin) + i * (player_width + margin)
+            y = (row_height + margin) * (row_count) + 6 * margin
+            pygame.draw.rect(self.screen, BACKGROUND, \
+                                 (x, y, player_width, row_height), 0)
+            self.render_text('%s: %s' % (player.name, player.points), x, y)
+
+        pygame.display.flip()
+
+    def render_question(self):
+        raise NotImplementedError
 
     def render_text(self, text, x, y):
         surface = self.font.render(text, 1, FOREGROUND)
@@ -114,7 +157,6 @@ class Game(object):
                 y + (surface.get_height() / 2)
                 )
             )
-        pygame.display.flip()
 
     def run(self):
         logging.debug('Game started.')
