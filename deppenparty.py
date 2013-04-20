@@ -34,11 +34,12 @@ class Answer(object):
     def __init__(self, answer, question, points):
         self.answer = answer
         self.question = question
-        self.active = True
         self.points = points
+        self.active = True
 
     def __repr__(self):
-        return 'Answer: %s, Question: %s' % (self.answer, self.question)
+        return 'Answer: %s, Question: %s, Points: %s, Active: %s' % \
+            (self.answer, self.question, self.points, self.active)
 
 class Cursor(object):
     def __init__(self, x, y):
@@ -125,9 +126,15 @@ class Game(object):
                             len(self.categories[0]['content']) - 1:
                         self.cursor.down()
                 elif event.key == pygame.K_RETURN:
-                    logging.debug('Answer at %s selected: %s' % \
-                        (self.cursor, self.get_current_answer()))
-                    self.state = STATE_ANSWER
+                    answer = self.get_current_answer()
+                    if answer.active:
+                        answer.active = False
+                        logging.debug('Answer at %s selected: %s' % \
+                                          (self.cursor, answer))
+                        self.state = STATE_ANSWER
+                    else:
+                        logging.debug('Answer at %s disabled.' % \
+                                          self.cursor)
             elif self.state == STATE_ANSWER:
                 if event.key == pygame.K_RETURN:
                     self.state = STATE_QUESTION
@@ -229,10 +236,14 @@ class Game(object):
                     pygame.draw.rect(self.screen, WHITE,
                         (x-margin/2, y-margin/2, \
                              col_width+margin, row_height+margin), 0)
-                pygame.draw.rect(self.screen, BACKGROUND, \
-                    (x, y, col_width, row_height), 0)
-                self.render_text(
-                    str(self.categories[i]['content'][j].points), x, y)
+                answer = self.categories[i]['content'][j]
+                if answer.active:
+                    pygame.draw.rect(self.screen, BACKGROUND, \
+                        (x, y, col_width, row_height), 0)
+                    self.render_text(str(answer.points), x, y)
+                else:
+                    pygame.draw.rect(self.screen, GRAY, \
+                        (x, y, col_width, row_height), 0)
 
         player_count = len(self.players)
         player_width = (self.width - ((3 + player_count) * margin)) / \
